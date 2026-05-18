@@ -34,20 +34,29 @@ st.write(
 
 genres = sorted(G_giant.nodes())
 
+
+if "source_genre" not in st.session_state:
+    st.session_state.source_genre = "metal" if "metal" in genres else genres[0]
+
+if "target_genre" not in st.session_state:
+    st.session_state.target_genre = "pop" if "pop" in genres else genres[1]
+
 col1, col2 = st.columns(2)
 
 with col1:
     source = st.selectbox(
         "Start genre",
         genres,
-        index=genres.index("metal") if "metal" in genres else 0
+        index=genres.index(st.session_state.source_genre),
+        key="source_genre"
     )
 
 with col2:
     target = st.selectbox(
         "Target genre",
         genres,
-        index=genres.index("pop") if "pop" in genres else 1
+        index=genres.index(st.session_state.target_genre),
+        key="target_genre"
     )
 
 # Convert similarity into distance for shortest path search.
@@ -58,25 +67,16 @@ for u, v, data in G_giant.edges(data=True):
 random_col1, random_col2 = st.columns([1, 3])
 
 with random_col1:
-
     if st.button("Random journey"):
-
         random_source, random_target = random.sample(genres, 2)
 
-        st.session_state.random_source = random_source
-        st.session_state.random_target = random_target
+        st.session_state.source_genre = random_source
+        st.session_state.target_genre = random_target
+
+        st.rerun()
 
 with random_col2:
-
-    if "random_source" in st.session_state:
-        st.info(
-            f"Random selection: "
-            f"{st.session_state.random_source} → "
-            f"{st.session_state.random_target}"
-        )
-
-        source = st.session_state.random_source
-        target = st.session_state.random_target
+    st.info(f"Current journey: {source} → {target}")
 
 if st.button("Find transition path"):
     try:
