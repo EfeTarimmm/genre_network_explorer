@@ -3,6 +3,7 @@ import networkx as nx
 from pathlib import Path
 from pyvis.network import Network
 import streamlit.components.v1 as components
+import random
 
 st.set_page_config(
     page_title="Genre Network Explorer",
@@ -54,6 +55,29 @@ for u, v, data in G_giant.edges(data=True):
     similarity = float(data.get("weight", 1.0))
     data["distance"] = 1 - similarity
 
+random_col1, random_col2 = st.columns([1, 3])
+
+with random_col1:
+
+    if st.button("Random journey"):
+
+        random_source, random_target = random.sample(genres, 2)
+
+        st.session_state.random_source = random_source
+        st.session_state.random_target = random_target
+
+with random_col2:
+
+    if "random_source" in st.session_state:
+        st.info(
+            f"Random selection: "
+            f"{st.session_state.random_source} → "
+            f"{st.session_state.random_target}"
+        )
+
+        source = st.session_state.random_source
+        target = st.session_state.random_target
+
 if st.button("Find transition path"):
     try:
         path = nx.shortest_path(
@@ -90,7 +114,12 @@ if st.button("Find transition path"):
         st.error("No path found between these genres.")
 
 
-show_network = st.checkbox("Show interactive network", value=False)
+show_network = st.checkbox(
+    "Show interactive network",
+    value=False
+)
+
+st.caption("For the best experience, we recommend using a PC. Mobile devices may run the network visualization more slowly.")
 
 if show_network:
     st.divider()
