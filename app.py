@@ -31,15 +31,22 @@ st.subheader("Exploring musical genres through network science")
 st.write(
     "Discover how musical genres connect through shared audio characteristics."
 )
-
 genres = sorted(G_giant.nodes())
 
+if "source_select" not in st.session_state:
+    st.session_state.source_select = "metal" if "metal" in genres else genres[0]
 
-if "source_genre" not in st.session_state:
-    st.session_state.source_genre = "metal" if "metal" in genres else genres[0]
+if "target_select" not in st.session_state:
+    st.session_state.target_select = "pop" if "pop" in genres else genres[1]
 
-if "target_genre" not in st.session_state:
-    st.session_state.target_genre = "pop" if "pop" in genres else genres[1]
+random_col1, random_col2 = st.columns([1, 3])
+
+with random_col1:
+    if st.button("Random journey"):
+        random_source, random_target = random.sample(genres, 2)
+        st.session_state.source_select = random_source
+        st.session_state.target_select = random_target
+        st.rerun()
 
 col1, col2 = st.columns(2)
 
@@ -47,36 +54,23 @@ with col1:
     source = st.selectbox(
         "Start genre",
         genres,
-        index=genres.index(st.session_state.source_genre),
-        key="source_genre"
+        key="source_select"
     )
 
 with col2:
     target = st.selectbox(
         "Target genre",
         genres,
-        index=genres.index(st.session_state.target_genre),
-        key="target_genre"
+        key="target_select"
     )
+
+with random_col2:
+    st.info(f"Current journey: {source} → {target}")
 
 # Convert similarity into distance for shortest path search.
 for u, v, data in G_giant.edges(data=True):
     similarity = float(data.get("weight", 1.0))
     data["distance"] = 1 - similarity
-
-random_col1, random_col2 = st.columns([1, 3])
-
-with random_col1:
-    if st.button("Random journey"):
-        random_source, random_target = random.sample(genres, 2)
-
-        st.session_state.source_genre = random_source
-        st.session_state.target_genre = random_target
-
-        st.rerun()
-
-with random_col2:
-    st.info(f"Current journey: {source} → {target}")
 
 if st.button("Find transition path"):
     try:
