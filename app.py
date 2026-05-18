@@ -89,6 +89,11 @@ if st.button("Find transition path"):
     except nx.NetworkXNoPath:
         st.error("No path found between these genres.")
 
+show_network = st.checkbox("Show interactive network", value=False)
+
+if show_network:
+    st.subheader("Interactive Genre Network")
+    # PyVis network kodunun tamamı buraya girsin
 st.divider()
 st.subheader("Interactive Genre Network")
 
